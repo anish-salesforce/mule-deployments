@@ -1,0 +1,50 @@
+# mule-deployments/.github/workflows/ci-build.yml
+
+name: Reusable Mule CI Workflow
+
+on:
+  workflow_call:
+    secrets:
+      CA_CLIENT_ID:
+        required: true
+      CA_CLIENT_SECRET:
+        required: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      CA_CLIENT_ID: ${{ secrets.CA_CLIENT_ID }}
+      CA_CLIENT_SECRET: ${{ secrets.CA_CLIENT_SECRET }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu'
+      
+      - name: Build and Test
+        run: mvn clean package -s ./.maven/settings.xml
+
+      - name: Rename Artifact with Commit Hash
+        run: |
+          artifact=$(ls target/*.jar | head -1)
+          hash=$(git rev-parse --short "$GITHUB_SHA")
+          renamed="target/$(basename "$artifact" .jar)-$hash.jar"
+          mv "$artifact" "$renamed"
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: mule-artifact
+          path: target/*.jar
