@@ -33,6 +33,11 @@ jobs:
           java-version: 17
           distribution: 'zulu'
       
+      - name: Recreate settings.xml
+        run: |
+          mkdir ./.maven
+          echo "${{ secrets.MAVEN_SETTINGS_B64 }}" | base64 --decode > .maven/settings.xml
+
       - name: Build and Test
         run: mvn clean package -s ./.maven/settings.xml
 
