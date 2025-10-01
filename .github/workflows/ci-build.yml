@@ -35,9 +35,10 @@ jobs:
       
       - name: Recreate settings.xml
         run: |
-          mkdir ./.maven
-          echo "${{ secrets.MAVEN_SETTINGS_B64 }}" | base64 --decode > ./.maven/settings.xml
-          cat ./.maven/settings.xml
+          mkdir -p .maven
+          echo "${{ secrets.MAVEN_SETTINGS_B64 }}" | base64 -d > .maven/settings.xml
+          ls -l .maven/
+          cat .maven/settings.xml
 
       - name: Build and Test
         run: mvn clean package -s ./.maven/settings.xml
