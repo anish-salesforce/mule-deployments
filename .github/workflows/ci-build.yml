@@ -39,7 +39,6 @@ jobs:
           mvn clean package \
             --batch-mode \
             -Dstyle.color=always \
-            -Dmaven.test.failure.ignore=false \
             -s .maven/settings.xml | tee mvn-output.log
 
           echo "✅ Build and test completed."
