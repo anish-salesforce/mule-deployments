@@ -27,24 +27,60 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       
-      - name: Set up JDK 11
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: 'zulu'
 
-      - name: Build and Test
-        run: mvn clean package -s .maven/settings.xml
-
-      - name: Rename Artifact with Commit Hash
+      - name: Build and Run Unit Tests with Output
         run: |
+          echo "🔨 Starting Maven build and MUnit test execution..."
+          mvn clean package \
+            --batch-mode \
+            -Dstyle.color=always \
+            -Dmaven.test.failure.ignore=false \
+            -s .maven/settings.xml | tee mvn-output.log
+
+          echo "✅ Build and test completed."
+          echo "📄 Test reports available in: target/surefire-reports/"
+          echo "📦 Artifacts generated in: target/*.jar"
+
+      - name: Rename JAR with Commit Hash
+        run: |
+          echo "🔍 Finding JAR file in target directory..."
           artifact=$(ls target/*.jar | head -1)
+          echo "📦 Found artifact: $artifact"
+
           hash=$(git rev-parse --short "$GITHUB_SHA")
           renamed="target/$(basename "$artifact" .jar)-$hash.jar"
+
+          echo "✏️ Renaming artifact to: $renamed"
           mv "$artifact" "$renamed"
+
+          echo "✅ JAR file renamed and ready for upload."
       
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: mule-artifact
           path: target/*.jar
+          retention-days: 30
+
+      - name: Upload JUnit XML Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-results
+          path: target/surefire-reports/*.xml
+          retention-days: 30
+
+      - name: Upload MUnit Coverage Report (if available)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: munit-coverage
+          path: |
+            target/site/munit/coverage/index.html
+            target/site/munit/coverage/clover.xml
+            target/site/munit/coverage/html/index.html
+          retention-days: 30
