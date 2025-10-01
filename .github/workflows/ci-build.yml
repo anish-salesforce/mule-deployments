@@ -32,16 +32,9 @@ jobs:
         with:
           java-version: 17
           distribution: 'zulu'
-      
-      - name: Recreate settings.xml
-        run: |
-          mkdir -p .maven
-          echo "${{ secrets.MAVEN_SETTINGS_B64 }}" | base64 -d > .maven/settings.xml
-          ls -l .maven/
-          cat .maven/settings.xml
 
       - name: Build and Test
-        run: mvn clean package -s ./.maven/settings.xml
+        run: mvn clean package -s .maven/settings.xml
 
       - name: Rename Artifact with Commit Hash
         run: |
