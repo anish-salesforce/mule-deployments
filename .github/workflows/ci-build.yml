@@ -39,7 +39,7 @@ jobs:
           mvn clean package \
             --batch-mode \
             -Dstyle.color=always \
-            -s .maven/settings.xml | tee mvn-output.log
+            -s .maven/settings.xml
 
           echo "✅ Build and test completed."
           echo "📄 Test reports available in: target/surefire-reports/"
