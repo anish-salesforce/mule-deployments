@@ -44,7 +44,7 @@ jobs:
           mv "$artifact" "$renamed"
       
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mule-artifact
           path: target/*.jar
