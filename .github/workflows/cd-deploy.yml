@@ -61,7 +61,7 @@ jobs:
       - name: Upload to Exchange
         run: |
           jar=$(ls *.jar | head -1)
-          mvn deploy -s ../mule-deployments/.maven/settings.xml -Dmule.artifact=$jar
+          mvn deploy -s .maven/settings.xml -Dmule.artifact=$jar
 
   deploy-to-cloudhub2:
     needs: publish-to-exchange
@@ -81,6 +81,6 @@ jobs:
           jar=$(ls *.jar | head -1)
           mvn deploy -DmuleDeploy \
               -Dmule.artifact=$jar \
-              -s ../mule-deployments/.maven/settings.xml \
+              -s .maven/settings.xml \
               -DskipTests \
               -DskipDeploymentVerification=true
