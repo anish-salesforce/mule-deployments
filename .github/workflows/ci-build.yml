@@ -39,6 +39,7 @@ jobs:
           mvn clean package \
             --batch-mode \
             -Dstyle.color=always \
+            -Dmaven.test.skip=false \
             -s .maven/settings.xml
 
           echo "✅ Build and test completed."
